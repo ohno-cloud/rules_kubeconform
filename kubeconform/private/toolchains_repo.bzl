@@ -50,24 +50,6 @@ PLATFORMS = {
             "@platforms//cpu:i386",
         ],
     ),
-    "windows-amd64": struct(
-        compatible_with = [
-            "@platforms//os:windows",
-            "@platforms//cpu:x86_64",
-        ],
-    ),
-    "windows-arm64": struct(
-        compatible_with = [
-            "@platforms//os:windows",
-            "@platforms//cpu:arm64",
-        ],
-    ),
-    "windows-386": struct(
-        compatible_with = [
-            "@platforms//os:windows",
-            "@platforms//cpu:i386",
-        ],
-    ),
 }
 
 def _toolchains_repo_impl(repository_ctx):
