@@ -42,7 +42,7 @@ Defines a kubeconform lint execution.
 <pre>
 load("@rules_kubeconform//kubeconform:defs.bzl", "kubeconform_import")
 
-kubeconform_import(<a href="#kubeconform_import-name">name</a>, <a href="#kubeconform_import-resources">resources</a>, <a href="#kubeconform_import-commit">commit</a>, <a href="#kubeconform_import-github_repo">github_repo</a>, <a href="#kubeconform_import-kube_version">kube_version</a>, <a href="#kubeconform_import-repo_mapping">repo_mapping</a>)
+kubeconform_import(<a href="#kubeconform_import-name">name</a>, <a href="#kubeconform_import-resources">resources</a>, <a href="#kubeconform_import-commit">commit</a>, <a href="#kubeconform_import-github_repo">github_repo</a>, <a href="#kubeconform_import-kube_version">kube_version</a>)
 </pre>
 
 Defines an imported kubeconform schemas.
@@ -53,10 +53,9 @@ Defines an imported kubeconform schemas.
 | Name  | Description | Type | Mandatory | Default |
 | :------------- | :------------- | :------------- | :------------- | :------------- |
 | <a id="kubeconform_import-name"></a>name |  A unique name for this repository.   | <a href="https://bazel.build/concepts/labels#target-names">Name</a> | required |  |
-| <a id="kubeconform_import-resources"></a>resources |  Resource schemas to import.   | <a href="https://bazel.build/rules/lib/dict">Dictionary: String -> List of strings</a> | required |  |
+| <a id="kubeconform_import-resources"></a>resources |  Resource schemas to import.   | <a href="https://bazel.build/rules/lib/core/dict">Dictionary: String -> List of strings</a> | required |  |
 | <a id="kubeconform_import-commit"></a>commit |  Commit.   | String | required |  |
 | <a id="kubeconform_import-github_repo"></a>github_repo |  GitHub repo name.   | String | required |  |
 | <a id="kubeconform_import-kube_version"></a>kube_version |  Kubernetes version.   | String | required |  |
-| <a id="kubeconform_import-repo_mapping"></a>repo_mapping |  In `WORKSPACE` context only: a dictionary from local repository name to global repository name. This allows controls over workspace dependency resolution for dependencies of this repository.<br><br>For example, an entry `"@foo": "@bar"` declares that, for any time this repository depends on `@foo` (such as a dependency on `@foo//some:target`, it should actually resolve that dependency within globally-declared `@bar` (`@bar//some:target`).<br><br>This attribute is _not_ supported in `MODULE.bazel` context (when invoking a repository rule inside a module extension's implementation function).   | <a href="https://bazel.build/rules/lib/dict">Dictionary: String -> String</a> | optional |  |
 
 

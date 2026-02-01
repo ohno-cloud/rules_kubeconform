@@ -34,7 +34,7 @@ kubeconform.schema_import(<a href="#kubeconform.schema_import-name">name</a>, <a
 | Name  | Description | Type | Mandatory | Default |
 | :------------- | :------------- | :------------- | :------------- | :------------- |
 | <a id="kubeconform.schema_import-name"></a>name |  Name of the resulting repository   | <a href="https://bazel.build/concepts/labels#target-names">Name</a> | required |  |
-| <a id="kubeconform.schema_import-resources"></a>resources |  Resource schemas to import.   | <a href="https://bazel.build/rules/lib/dict">Dictionary: String -> List of strings</a> | required |  |
+| <a id="kubeconform.schema_import-resources"></a>resources |  Resource schemas to import.   | <a href="https://bazel.build/rules/lib/core/dict">Dictionary: String -> List of strings</a> | required |  |
 | <a id="kubeconform.schema_import-commit"></a>commit |  Commit.   | String | required |  |
 | <a id="kubeconform.schema_import-github_repo"></a>github_repo |  GitHub repo name.   | String | required |  |
 | <a id="kubeconform.schema_import-kube_version"></a>kube_version |  Kubernetes version.   | String | required |  |

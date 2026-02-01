@@ -33,4 +33,3 @@ use_repo(
 )
 
 register_toolchains("@kubeconform_0_6_7_toolchains//...")
-
