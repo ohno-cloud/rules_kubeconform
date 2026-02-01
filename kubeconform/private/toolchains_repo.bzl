@@ -50,24 +50,6 @@ PLATFORMS = {
             "@platforms//cpu:i386",
         ],
     ),
-    "windows-amd64": struct(
-        compatible_with = [
-            "@platforms//os:windows",
-            "@platforms//cpu:x86_64",
-        ],
-    ),
-    "windows-arm64": struct(
-        compatible_with = [
-            "@platforms//os:windows",
-            "@platforms//cpu:arm64",
-        ],
-    ),
-    "windows-386": struct(
-        compatible_with = [
-            "@platforms//os:windows",
-            "@platforms//cpu:i386",
-        ],
-    ),
 }
 
 def _toolchains_repo_impl(repository_ctx):
@@ -91,7 +73,6 @@ def _resolved_toolchain_impl(ctx):
 resolved_toolchain = rule(
     implementation = _resolved_toolchain_impl,
     toolchains = ["@rules_kubeconform//kubeconform:toolchain_type"],
-    incompatible_use_toolchain_transition = True,
 )
 """
     repository_ctx.file("defs.bzl", starlark_content)
