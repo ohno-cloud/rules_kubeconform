@@ -19,17 +19,8 @@ def _to_manifest_path(ctx, file):
         return ctx.workspace_name + "/" + file.short_path
 
 def _kubeconform_toolchain_impl(ctx):
-    if ctx.attr.target_tool and ctx.attr.target_tool_path:
-        fail("Can only set one of target_tool or target_tool_path but both were set.")
-    if not ctx.attr.target_tool and not ctx.attr.target_tool_path:
-        fail("Must set one of target_tool or target_tool_path.")
-
-    tool_files = []
-    target_tool_path = ctx.attr.target_tool_path
-
-    if ctx.attr.target_tool:
-        tool_files = ctx.attr.target_tool.files.to_list()
-        target_tool_path = _to_manifest_path(ctx, tool_files[0])
+    tool_files = ctx.files.target_tool
+    target_tool_path = _to_manifest_path(ctx, ctx.file.target_tool)
 
     # Make the $(KUBECONFORM_BIN) variable available in places like genrules.
     # See https://docs.bazel.build/versions/main/be/make-variables.html#custom_variables
@@ -65,12 +56,8 @@ kubeconform_toolchain = rule(
     attrs = {
         "target_tool": attr.label(
             doc = "A hermetically downloaded executable target for the target platform.",
-            mandatory = False,
+            mandatory = True,
             allow_single_file = True,
-        ),
-        "target_tool_path": attr.string(
-            doc = "Path to an existing executable for the target platform.",
-            mandatory = False,
         ),
     },
     doc = """Defines a kubeconform compiler/runtime toolchain.

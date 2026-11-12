@@ -64,15 +64,10 @@ kubeconform_archive = repository_rule(
     implementation = _kubeconform_archive_impl,
     doc = """Downloads a checksum-pinned Kubeconform release.
 
-Requires Bazel 9 or newer and either sha256 or integrity. This does not query the
+Requires either sha256 or integrity. This does not query the
 mutable GitHub releases API and declares its output reproducible for
 repository-content caching. Use it from a module extension or via use_repo_rule
 in MODULE.bazel.
-
-Consumers opt into the experimental remote cache with the startup flag
---experimental_remote_repo_contents_cache and their own --remote_cache or
---remote_executor configuration. Cache misses still execute the repository rule
-locally, and cache population requires client-side cache-write permission.
 """,
     attrs = dict(_ATTRS, **{
         "sha256": attr.string(doc = "Expected archive SHA-256; required unless integrity is supplied."),
@@ -93,10 +88,6 @@ def kubeconform_toolchain_repositories(name, kubeconform_version, checksums = No
         name: Name of the toolchain registration repository and prefix for its archives.
         kubeconform_version: Release version without a v prefix.
         checksums: Optional platform-to-SHA-256 mapping, overriding built-in release checksums.
-            Versions 0.6.7, 0.7.0, and 0.8.0 are built in. Other releases need entries for
-            each platform to register. Only platforms with checksums are registered;
-            0.6.7 and 0.7.0 include linux-386, but 0.8.0 no longer publishes it.
-            Platform archives remain lazily fetched.
     """
     archive_name = "{}_{}".format(name, kubeconform_version.replace(".", "_"))
     release_checksums = dict(_ARCHIVE_SHA256.get(kubeconform_version, {}))

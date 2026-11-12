@@ -65,9 +65,7 @@ _toolchain = tag_class(attrs = {
     ),
     "version": attr.string(doc = "Kubeconform release version without a v prefix.", mandatory = True),
     "checksums": attr.string_dict(
-        doc = """Platform-to-SHA-256 overrides. Versions 0.6.7, 0.7.0, and 0.8.0 have built-in
-checksums for macOS/Linux amd64 and arm64; 0.6.7 and 0.7.0 also support linux-386.
-Other releases require entries for each platform to register. Only platforms
+        doc = """Platform-to-SHA-256 overrides. Only platforms
 with checksums are registered, and only the selected execution platform is downloaded.""",
     ),
 })
@@ -103,9 +101,7 @@ on first use (trust-on-first-use), saved as module facts in MODULE.bazel.lock,
 and reused to verify subsequent downloads. Commit and review lockfile updates.
 No per-schema checksum maintenance is required in MODULE.bazel.
 
-Only requested schemas are downloaded. A full archive of the example's upstream
-revision exceeded 1 GiB expanded before download completion, so selective fetches
-avoid downloading and extracting the entire repository.
+Only requested schemas are downloaded.
 """,
     implementation = _kubeconform_impl,
     tag_classes = {"toolchain": _toolchain, "schema_import": _import},
