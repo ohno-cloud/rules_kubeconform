@@ -19,11 +19,8 @@ jobs:
         os:
           - ubuntu-latest
           - macos-latest
-          # builds on windows fail
-          # https://github.com/bazelbuild/rules_docker/issues/1524
-          # https://github.com/bazelbuild/rules_docker/issues/1438
-          # - windows-latest
-        bazel: [ 4.2.1, 5.0.0-pre.20211011.2 ]
+          # Native Windows execution is not currently supported.
+        bazel: [ '9.x', '9.3.2' ]
     # The type of runner that the job will run on
     runs-on: ${{ matrix.os }}
 
@@ -32,15 +29,15 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: bazelbuild/setup-bazelisk@v1
       - name: Mount bazel action cache
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: "~/.cache/bazel"
           key: bazel
       - name: Mount bazel repo cache
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: "~/.cache/bazel-repo"
           key: bazel-repo
@@ -58,3 +55,6 @@ jobs:
           # Bazelisk will download bazel to here
           XDG_CACHE_HOME: ~/.cache/bazel-repo
         run: bazel --bazelrc=.github/workflows/ci.bazelrc --bazelrc=.bazelrc test ...
+      - name: Test example consumer
+        working-directory: example
+        run: bazel test //... --test_output=errors --lockfile_mode=error

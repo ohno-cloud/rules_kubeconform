@@ -1,27 +1,52 @@
 # Bazel rules for kubeconform
 
-## Installation
+Validate Kubernetes manifests with [Kubeconform](https://github.com/yannh/kubeconform).
+The checksum-pinned APIs require **Bazel 9 or newer**.
 
-Include this in your WORKSPACE file:
+## Installation with Bzlmod
+
+Add the dependency and extension to `MODULE.bazel` (use the appropriate published
+ruleset version):
 
 ```starlark
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+bazel_dep(name = "rules_kubeconform", version = "0.0.0")
 
-http_archive(
-    name = "slamdev_rules_kubeconform",
-    url = "https://github.com/slamdev/rules_kubeconform/releases/download/0.0.0/slamdev_rules_kubeconform-v0.0.0.tar.gz",
-    sha256 = "",
+kubeconform = use_extension("@rules_kubeconform//kubeconform:extensions.bzl", "kubeconform")
+kubeconform.toolchain(version = "0.6.7")
+kubeconform.schema_import(
+    name = "kubernetes_json_schema",
+    github_repo = "yannh/kubernetes-json-schema",
+    commit = "f5e9af7e64b63484e2bf2ee28afee3f3f8e2e9b1",
+    kube_version = "1.31.0",
+    resources = {"Deployment": ["apps/v1"]},
 )
+use_repo(kubeconform, "kubernetes_json_schema", "kubeconform_0_6_7_toolchains")
+register_toolchains("@kubeconform_0_6_7_toolchains//...")
+```
 
-load("@slamdev_rules_kubeconform//kubeconform:deps.bzl", "kubeconform_register_toolchains", "rules_kubeconform_dependencies")
+Then declare a test in `BUILD.bazel`:
 
-rules_kubeconform_dependencies()
+```starlark
+load("@rules_kubeconform//kubeconform:defs.bzl", "kubeconform_lint_test")
 
-kubeconform_register_toolchains(
-    name = "kubeconform0_4_12",
-    kubeconform_version = "0.4.12",
+kubeconform_lint_test(
+    name = "lint",
+    srcs = glob(["*.yaml"]),
+    schema_locations = ["@kubernetes_json_schema//:schemas"],
+    strict = True,
 )
 ```
 
-> note, in the above, replace the version and sha256 with the one indicated
-> in the release notes for rules_kubeconform.
+See [`example/`](example/) for a runnable consumer workspace.
+
+## Documentation
+
+- [Module extension](docs/extensions.md)
+- [Repository rules](docs/repositories.md)
+- [Validation rules](docs/rules.md)
+- [Contributing and testing](CONTRIBUTING.md)
+
+## Platforms
+
+Toolchains currently support macOS and Linux. Native Windows execution is not
+supported.

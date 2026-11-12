@@ -1,7 +1,7 @@
 module(
     name = "rules_kubeconform",
     version = "0.0.0",
-    compatibility_level = 1,
+    bazel_compatibility = [">=9.0.0"],
 )
 
 bazel_dep(name = "bazel_skylib", version = "1.8.2")
@@ -13,3 +13,6 @@ bazel_dep(name = "bazel_skylib_gazelle_plugin", version = "1.8.2", dev_dependenc
 bazel_dep(name = "stardoc", version = "0.8.1", dev_dependency = True)
 bazel_dep(name = "rules_pkg", version = "1.2.0", dev_dependency = True)
 bazel_dep(name = "aspect_bazel_lib", version = "2.22.5", dev_dependency = True)
+
+# Expose the prebuilt-protoc setting used for local documentation generation.
+bazel_dep(name = "protobuf", version = "33.4", dev_dependency = True)

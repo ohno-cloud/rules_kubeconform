@@ -44,7 +44,6 @@ bzl_library(
     deps = [
         ":repositories",
         "//kubeconform/private/rules:import",
-        "@bazel_tools//tools/build_defs/repo:http.bzl",
     ],
 )
 
