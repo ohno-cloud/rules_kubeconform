@@ -20,7 +20,7 @@ jobs:
           - ubuntu-latest
           - macos-latest
           # Native Windows execution is not currently supported.
-        bazel: [ '9.x', '9.3.2' ]
+        bazel: [ '9.1', '9.3.2' ]
     # The type of runner that the job will run on
     runs-on: ${{ matrix.os }}
 
