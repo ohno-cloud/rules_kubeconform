@@ -1,6 +1,5 @@
-load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
-load("@rules_pkg//:pkg.bzl", "pkg_tar")
 load("@gazelle//:def.bzl", "gazelle", "gazelle_binary")
+load("@rules_pkg//:pkg.bzl", "pkg_tar")
 
 gazelle_binary(
     name = "gazelle_bin",
@@ -17,6 +16,7 @@ pkg_tar(
     name = "rules_kubeconform",
     srcs = [
         "LICENSE",
+        "MODULE.bazel",
         "README.md",
         "//kubeconform:package_content",
     ],
@@ -26,14 +26,4 @@ pkg_tar(
     # Make it owned by root so it does not have the uid of the CI robot.
     owner = "0.0",
     strip_prefix = ".",
-)
-
-bzl_library(
-    name = "internal_deps",
-    srcs = ["internal_deps.bzl"],
-    visibility = ["//visibility:public"],
-    deps = [
-        "@bazel_tools//tools/build_defs/repo:http.bzl",
-        "@bazel_tools//tools/build_defs/repo:utils.bzl",
-    ],
 )

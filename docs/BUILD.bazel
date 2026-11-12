@@ -1,9 +1,10 @@
+load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
+
 # These loads are in the docs/ package rather than anything users depend on
 # so that the dependency on stardoc doesn't leak to them.
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("@stardoc//stardoc:stardoc.bzl", "stardoc")
-load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
 
 # Dictionary mapping from the label of a starlark module
 # (like //kubeconform:some.bzl) to the markdown file in this
@@ -27,7 +28,7 @@ _DOCS = {
         md,
     ] in _DOCS.items()
 ]
-    
+
 write_source_files(
     name = "docs",
     files = {

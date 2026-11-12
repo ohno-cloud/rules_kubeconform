@@ -1,6 +1,6 @@
 """Bzlmod setup for checksum-pinned Kubeconform toolchains and schemas."""
 
-load("//kubeconform:repositories.bzl", "kubeconform_register_toolchains")
+load("//kubeconform:repositories.bzl", "kubeconform_toolchain_repositories")
 load("//kubeconform/private/rules:import.bzl", "kubeconform_import", "schema_downloads")
 
 def _kubeconform_impl(ctx):
@@ -48,11 +48,10 @@ def _kubeconform_impl(ctx):
         )
 
     for toolchain in toolchains:
-        kubeconform_register_toolchains(
-            name = "kubeconform_{}".format(toolchain.version.replace(".", "_")),
+        kubeconform_toolchain_repositories(
+            name = toolchain.name,
             kubeconform_version = toolchain.version,
             checksums = toolchain.checksums,
-            register = False,
         )
 
     # Discovery is trust-on-first-use. Preserve its checksums in the lockfile;
@@ -60,11 +59,16 @@ def _kubeconform_impl(ctx):
     return ctx.extension_metadata(facts = facts)
 
 _toolchain = tag_class(attrs = {
+    "name": attr.string(
+        default = "kubeconform_toolchain",
+        doc = "Name of the toolchain registration repository. Use distinct names when selecting multiple versions.",
+    ),
     "version": attr.string(doc = "Kubeconform release version without a v prefix.", mandatory = True),
     "checksums": attr.string_dict(
-        doc = """Platform-to-SHA-256 overrides. Version 0.6.7 has built-in checksums;
-other releases require entries for darwin-amd64, darwin-arm64, linux-amd64,
-linux-arm64, and linux-386. Only the selected execution platform is downloaded.""",
+        doc = """Platform-to-SHA-256 overrides. Versions 0.6.7, 0.7.0, and 0.8.0 have built-in
+checksums for macOS/Linux amd64 and arm64; 0.6.7 and 0.7.0 also support linux-386.
+Other releases require entries for each platform to register. Only platforms
+with checksums are registered, and only the selected execution platform is downloaded.""",
     ),
 })
 

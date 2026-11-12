@@ -1,7 +1,7 @@
 # Bazel rules for kubeconform
 
 Validate Kubernetes manifests with [Kubeconform](https://github.com/yannh/kubeconform).
-The checksum-pinned APIs require **Bazel 9 or newer**.
+Requires **Bazel 9 or newer** and Bzlmod (`MODULE.bazel`). WORKSPACE setup is not supported.
 
 ## Installation with Bzlmod
 
@@ -12,7 +12,7 @@ ruleset version):
 bazel_dep(name = "rules_kubeconform", version = "0.0.0")
 
 kubeconform = use_extension("@rules_kubeconform//kubeconform:extensions.bzl", "kubeconform")
-kubeconform.toolchain(version = "0.6.7")
+kubeconform.toolchain(version = "0.8.0")
 kubeconform.schema_import(
     name = "kubernetes_json_schema",
     github_repo = "yannh/kubernetes-json-schema",
@@ -20,8 +20,8 @@ kubeconform.schema_import(
     kube_version = "1.31.0",
     resources = {"Deployment": ["apps/v1"]},
 )
-use_repo(kubeconform, "kubernetes_json_schema", "kubeconform_0_6_7_toolchains")
-register_toolchains("@kubeconform_0_6_7_toolchains//...")
+use_repo(kubeconform, "kubernetes_json_schema", "kubeconform_toolchain")
+register_toolchains("@kubeconform_toolchain//...")
 ```
 
 Then declare a test in `BUILD.bazel`:

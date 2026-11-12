@@ -1,44 +1,14 @@
-"""Declare runtime dependencies
+"""Checksum-pinned repository rules and toolchain setup for Bzlmod extensions."""
 
-These are needed for local dev, and users must install them as well.
-See https://docs.bazel.build/versions/main/skylark/deploying.html#dependencies
-"""
-
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 load("//kubeconform/private:toolchains_repo.bzl", "PLATFORMS", "toolchains_repo")
 
-# WARNING: any changes in this function may be BREAKING CHANGES for users
-# because we'll fetch a dependency which may be different from one that
-# they were previously fetching later in their WORKSPACE setup, and now
-# ours took precedence. Such breakages are challenging for users, so any
-# changes in this function should be marked as BREAKING in the commit message
-# and released only in semver majors.
-def rules_kubeconform_dependencies():
-    # The minimal version of bazel_skylib we require
-    maybe(
-        http_archive,
-        name = "bazel_skylib",
-        sha256 = "c6966ec828da198c5d9adbaa94c05e3a1c7f21bd012a0b29ba8ddbccb2c93b0d",
-        urls = [
-            "https://github.com/bazelbuild/bazel-skylib/releases/download/1.1.1/bazel-skylib-1.1.1.tar.gz",
-            "https://mirror.bazel.build/github.com/bazelbuild/bazel-skylib/releases/download/1.1.1/bazel-skylib-1.1.1.tar.gz",
-        ],
-    )
-
-_DOC = """Legacy, unpinned Kubeconform release downloader.
-
-This rule queries the mutable GitHub releases API and does not declare its output
-reproducible. Prefer kubeconform_archive for checksum verification and Bazel 9
-repository-content caching.
-"""
 _ATTRS = {
     "kubeconform_version": attr.string(doc = "Release version without a v prefix.", mandatory = True),
     "platform": attr.string(doc = "Execution platform of the release archive.", mandatory = True, values = PLATFORMS.keys()),
 }
 
 # Checksums published with the upstream release. Additional versions can be
-# selected with the checksums argument to kubeconform_register_toolchains.
+# selected with the checksums argument to kubeconform_toolchain_repositories.
 _ARCHIVE_SHA256 = {
     "0.6.7": {
         "darwin-amd64": "3b5324ac4fd38ac60a49823b4051ff42ff7eb70144f1e9741fed1d14bc4fdb4e",
@@ -46,6 +16,19 @@ _ARCHIVE_SHA256 = {
         "linux-386": "e13c621d986cfc2aad3754a4313c4c7e876cad0606c472edea6cb69eb54481f5",
         "linux-amd64": "95f14e87aa28c09d5941f11bd024c1d02fdc0303ccaa23f61cef67bc92619d73",
         "linux-arm64": "dc82f79bb03c5479b1ae5fd4af221e4b5a3111f62bf01a2795d9c5c20fa96644",
+    },
+    "0.7.0": {
+        "darwin-amd64": "c6771cc894d82e1b12f35ee797dcda1f7da6a3787aa30902a15c264056dd40d4",
+        "darwin-arm64": "b5d32b2cb77f9c781c976b20a85e2d0bc8f9184d5d1cfe665a2f31a19f99eeb9",
+        "linux-386": "1b540677a77064aadae65099ac14030066d91a97b2f7bd381a955eedd636ac6b",
+        "linux-amd64": "c31518ddd122663b3f3aa874cfe8178cb0988de944f29c74a0b9260920d115d3",
+        "linux-arm64": "cc907ccf9e3c34523f0f32b69745265e0a6908ca85b92f41931d4537860eb83c",
+    },
+    "0.8.0": {
+        "darwin-amd64": "71dbc87ac9f24099a62b93570e65aa06312ba6ac8aea63b7f86e9d999edf5a92",
+        "darwin-arm64": "f84f4dfbebf4a6b0b230385fa065a39ea35e02608c2b50d025dcf64775a69d67",
+        "linux-amd64": "9bc2bffbf71f261128533edaf912153948b7ff238f9a531ae6d34466ec287883",
+        "linux-arm64": "1f53fc8e81258197a35e8603054162a5af1de8c5af13746c71ab680d9534ed87",
     },
 }
 
@@ -81,9 +64,10 @@ kubeconform_archive = repository_rule(
     implementation = _kubeconform_archive_impl,
     doc = """Downloads a checksum-pinned Kubeconform release.
 
-Requires Bazel 9 or newer and either sha256 or integrity. Unlike the legacy
-kubeconform_repositories rule, this does not query the mutable GitHub releases
-API and declares its output reproducible for repository-content caching.
+Requires Bazel 9 or newer and either sha256 or integrity. This does not query the
+mutable GitHub releases API and declares its output reproducible for
+repository-content caching. Use it from a module extension or via use_repo_rule
+in MODULE.bazel.
 
 Consumers opt into the experimental remote cache with the startup flag
 --experimental_remote_repo_contents_cache and their own --remote_cache or
@@ -96,73 +80,51 @@ locally, and cache population requires client-side cache-write permission.
     }),
 )
 
-def _kubeconform_repo_impl(repository_ctx):
-    repository_ctx.report_progress("Downloading Kubeconform releases info")
-    repository_ctx.download(
-        url = ["https://api.github.com/repos/yannh/kubeconform/releases"],
-        output = "versions.json",
-    )
-    versions = repository_ctx.read("versions.json")
-    version_found = False
-    for v in json.decode(versions):
-        version = v["tag_name"].lstrip("v")
-        if version == repository_ctx.attr.kubeconform_version:
-            version_found = True
-    if not version_found:
-        fail("did not find {} version in https://api.github.com/repos/kubeconform/kubeconform/releases".format(repository_ctx.attr.kubeconform_version))
+def kubeconform_toolchain_repositories(name, kubeconform_version, checksums = None):
+    """Creates checksum-pinned toolchain repositories from a module extension.
 
-    file_url = "https://github.com/yannh/kubeconform/releases/download/v{}/kubeconform-{}.tar.gz".format(repository_ctx.attr.kubeconform_version, repository_ctx.attr.platform)
+    Creates a registration repository named name, plus version- and platform-qualified
+    archive repositories that are lazily fetched when needed.
 
-    repository_ctx.report_progress("Downloading and extracting Kubeconform toolchain")
-    repository_ctx.download_and_extract(
-        url = file_url,
-    )
-
-    _write_toolchain_build(repository_ctx)
-
-kubeconform_repositories = repository_rule(
-    _kubeconform_repo_impl,
-    doc = _DOC,
-    attrs = _ATTRS,
-)
-
-# Wrapper macro around everything above, this is the primary API
-def kubeconform_register_toolchains(name, register = True, checksums = None, **kwargs):
-    """Convenience macro for users which does typical setup.
-
-    - create a repository for each built-in platform like "kubeconform_linux_amd64" -
-      this repository is lazily fetched when kubeconform is needed for that platform.
-    - create a repository exposing toolchains for each platform like "kubeconform_platforms"
-    - register a toolchain pointing at each platform
-    Users can avoid this macro and do these steps themselves, if they want more control.
+    Register the generated toolchains with register_toolchains in MODULE.bazel.
+    Normally users configure these repositories through the kubeconform extension.
 
     Args:
-        name: base name for all created repos, like "kubeconform0_4_12"
-        register: Whether to register toolchains (False when called by a module extension).
+        name: Name of the toolchain registration repository and prefix for its archives.
+        kubeconform_version: Release version without a v prefix.
         checksums: Optional platform-to-SHA-256 mapping, overriding built-in release checksums.
-            Version 0.6.7 is built in; other releases need entries for every platform
-            in PLATFORMS. Platform archives remain lazily fetched.
-        **kwargs: passed to each kubeconform_archive call; includes kubeconform_version
+            Versions 0.6.7, 0.7.0, and 0.8.0 are built in. Other releases need entries for
+            each platform to register. Only platforms with checksums are registered;
+            0.6.7 and 0.7.0 include linux-386, but 0.8.0 no longer publishes it.
+            Platform archives remain lazily fetched.
     """
-    release_checksums = dict(_ARCHIVE_SHA256.get(kwargs.get("kubeconform_version"), {}))
+    archive_name = "{}_{}".format(name, kubeconform_version.replace(".", "_"))
+    release_checksums = dict(_ARCHIVE_SHA256.get(kubeconform_version, {}))
     release_checksums.update(checksums or {})
-    missing = [platform for platform in PLATFORMS if not release_checksums.get(platform)]
+    if not release_checksums:
+        fail("No archive checksums for Kubeconform {}. Supply checksums for the platforms to register.".format(
+            kubeconform_version,
+        ))
+    unknown = [platform for platform in release_checksums if platform not in PLATFORMS]
+    if unknown:
+        fail("Unsupported Kubeconform platforms: {}".format(", ".join(unknown)))
+    missing = [platform for platform, checksum in release_checksums.items() if not checksum]
     if missing:
         fail("No archive checksums for Kubeconform {} on {}. Supply checksums for these platforms.".format(
-            kwargs.get("kubeconform_version"),
+            kubeconform_version,
             ", ".join(missing),
         ))
-    for platform in PLATFORMS.keys():
+    platforms = [platform for platform in PLATFORMS if platform in release_checksums]
+    for platform in platforms:
         kubeconform_archive(
-            name = name + "_" + platform,
+            name = archive_name + "_" + platform,
+            kubeconform_version = kubeconform_version,
             platform = platform,
             sha256 = release_checksums[platform],
-            **kwargs
         )
-        if register:
-            native.register_toolchains("@%s_toolchains//:%s_toolchain" % (name, platform))
 
     toolchains_repo(
-        name = name + "_toolchains",
-        user_repository_name = name,
+        name = name,
+        platforms = platforms,
+        user_repository_name = archive_name,
     )

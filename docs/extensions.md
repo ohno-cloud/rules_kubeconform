@@ -8,7 +8,7 @@ Bzlmod setup for checksum-pinned Kubeconform toolchains and schemas.
 
 <pre>
 kubeconform = use_extension("@rules_kubeconform//kubeconform:extensions.bzl", "kubeconform")
-kubeconform.toolchain(<a href="#kubeconform.toolchain-checksums">checksums</a>, <a href="#kubeconform.toolchain-version">version</a>)
+kubeconform.toolchain(<a href="#kubeconform.toolchain-name">name</a>, <a href="#kubeconform.toolchain-checksums">checksums</a>, <a href="#kubeconform.toolchain-version">version</a>)
 kubeconform.schema_import(<a href="#kubeconform.schema_import-name">name</a>, <a href="#kubeconform.schema_import-resources">resources</a>, <a href="#kubeconform.schema_import-commit">commit</a>, <a href="#kubeconform.schema_import-github_repo">github_repo</a>, <a href="#kubeconform.schema_import-kube_version">kube_version</a>)
 </pre>
 
@@ -34,7 +34,8 @@ avoid downloading and extracting the entire repository.
 
 | Name  | Description | Type | Mandatory | Default |
 | :------------- | :------------- | :------------- | :------------- | :------------- |
-| <a id="kubeconform.toolchain-checksums"></a>checksums |  Platform-to-SHA-256 overrides. Version 0.6.7 has built-in checksums; other releases require entries for darwin-amd64, darwin-arm64, linux-amd64, linux-arm64, and linux-386. Only the selected execution platform is downloaded.   | <a href="https://bazel.build/rules/lib/core/dict">Dictionary: String -> String</a> | optional |  `{}`  |
+| <a id="kubeconform.toolchain-name"></a>name |  Name of the toolchain registration repository. Use distinct names when selecting multiple versions.   | <a href="https://bazel.build/concepts/labels#target-names">Name</a> | optional |  `"kubeconform_toolchain"`  |
+| <a id="kubeconform.toolchain-checksums"></a>checksums |  Platform-to-SHA-256 overrides. Versions 0.6.7, 0.7.0, and 0.8.0 have built-in checksums for macOS/Linux amd64 and arm64; 0.6.7 and 0.7.0 also support linux-386. Other releases require entries for each platform to register. Only platforms with checksums are registered, and only the selected execution platform is downloaded.   | <a href="https://bazel.build/rules/lib/core/dict">Dictionary: String -> String</a> | optional |  `{}`  |
 | <a id="kubeconform.toolchain-version"></a>version |  Kubeconform release version without a v prefix.   | String | required |  |
 
 <a id="kubeconform.schema_import"></a>

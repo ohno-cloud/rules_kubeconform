@@ -247,11 +247,9 @@
     },
     "@@rules_kubeconform+//kubeconform:extensions.bzl%kubeconform": {
       "general": {
-        "bzlTransitiveDigest": "Ih+G4h/1LJb2jux5DHM+7uDCZ7pF8bk4XIFx0pzW/mk=",
-        "usagesDigest": "H+TJwrI15p1rTSQZWZE21YOgrhd6/wXTtOukODpaiOo=",
-        "recordedInputs": [
-          "REPO_MAPPING:rules_kubeconform+,bazel_tools bazel_tools"
-        ],
+        "bzlTransitiveDigest": "ZeeKk4+huaaA4e8cMb7ulExs0xSTTVNtmWTBV1KW/CY=",
+        "usagesDigest": "1wp4UuZG4ShhK7AUsFFfqp2Dgpb8nD4TGe+yGckNBvs=",
+        "recordedInputs": [],
         "generatedRepoSpecs": {
           "kubernetes_json_schema": {
             "repoRuleId": "@@rules_kubeconform+//kubeconform/private/rules:import.bzl%kubeconform_import",
@@ -269,50 +267,101 @@
               }
             }
           },
-          "kubeconform_0_6_7_darwin-amd64": {
+          "kubeconform_toolchain_0_8_0_darwin-amd64": {
             "repoRuleId": "@@rules_kubeconform+//kubeconform:repositories.bzl%kubeconform_archive",
             "attributes": {
+              "kubeconform_version": "0.8.0",
               "platform": "darwin-amd64",
-              "sha256": "3b5324ac4fd38ac60a49823b4051ff42ff7eb70144f1e9741fed1d14bc4fdb4e",
-              "kubeconform_version": "0.6.7"
+              "sha256": "71dbc87ac9f24099a62b93570e65aa06312ba6ac8aea63b7f86e9d999edf5a92"
             }
           },
-          "kubeconform_0_6_7_darwin-arm64": {
+          "kubeconform_toolchain_0_8_0_darwin-arm64": {
             "repoRuleId": "@@rules_kubeconform+//kubeconform:repositories.bzl%kubeconform_archive",
             "attributes": {
+              "kubeconform_version": "0.8.0",
               "platform": "darwin-arm64",
-              "sha256": "cbb47d938a8d18eb5f79cb33663b2cecdee0c8ac0bf562ebcfca903df5f0802f",
-              "kubeconform_version": "0.6.7"
+              "sha256": "f84f4dfbebf4a6b0b230385fa065a39ea35e02608c2b50d025dcf64775a69d67"
             }
           },
-          "kubeconform_0_6_7_linux-amd64": {
+          "kubeconform_toolchain_0_8_0_linux-amd64": {
             "repoRuleId": "@@rules_kubeconform+//kubeconform:repositories.bzl%kubeconform_archive",
             "attributes": {
+              "kubeconform_version": "0.8.0",
               "platform": "linux-amd64",
-              "sha256": "95f14e87aa28c09d5941f11bd024c1d02fdc0303ccaa23f61cef67bc92619d73",
-              "kubeconform_version": "0.6.7"
+              "sha256": "9bc2bffbf71f261128533edaf912153948b7ff238f9a531ae6d34466ec287883"
             }
           },
-          "kubeconform_0_6_7_linux-arm64": {
+          "kubeconform_toolchain_0_8_0_linux-arm64": {
             "repoRuleId": "@@rules_kubeconform+//kubeconform:repositories.bzl%kubeconform_archive",
             "attributes": {
+              "kubeconform_version": "0.8.0",
               "platform": "linux-arm64",
-              "sha256": "dc82f79bb03c5479b1ae5fd4af221e4b5a3111f62bf01a2795d9c5c20fa96644",
-              "kubeconform_version": "0.6.7"
+              "sha256": "1f53fc8e81258197a35e8603054162a5af1de8c5af13746c71ab680d9534ed87"
             }
           },
-          "kubeconform_0_6_7_linux-386": {
-            "repoRuleId": "@@rules_kubeconform+//kubeconform:repositories.bzl%kubeconform_archive",
-            "attributes": {
-              "platform": "linux-386",
-              "sha256": "e13c621d986cfc2aad3754a4313c4c7e876cad0606c472edea6cb69eb54481f5",
-              "kubeconform_version": "0.6.7"
-            }
-          },
-          "kubeconform_0_6_7_toolchains": {
+          "kubeconform_toolchain": {
             "repoRuleId": "@@rules_kubeconform+//kubeconform/private:toolchains_repo.bzl%toolchains_repo",
             "attributes": {
-              "user_repository_name": "kubeconform_0_6_7"
+              "platforms": [
+                "darwin-amd64",
+                "darwin-arm64",
+                "linux-amd64",
+                "linux-arm64"
+              ],
+              "user_repository_name": "kubeconform_toolchain_0_8_0"
+            }
+          },
+          "kubeconform_0_7_0_toolchain_0_7_0_darwin-amd64": {
+            "repoRuleId": "@@rules_kubeconform+//kubeconform:repositories.bzl%kubeconform_archive",
+            "attributes": {
+              "kubeconform_version": "0.7.0",
+              "platform": "darwin-amd64",
+              "sha256": "c6771cc894d82e1b12f35ee797dcda1f7da6a3787aa30902a15c264056dd40d4"
+            }
+          },
+          "kubeconform_0_7_0_toolchain_0_7_0_darwin-arm64": {
+            "repoRuleId": "@@rules_kubeconform+//kubeconform:repositories.bzl%kubeconform_archive",
+            "attributes": {
+              "kubeconform_version": "0.7.0",
+              "platform": "darwin-arm64",
+              "sha256": "b5d32b2cb77f9c781c976b20a85e2d0bc8f9184d5d1cfe665a2f31a19f99eeb9"
+            }
+          },
+          "kubeconform_0_7_0_toolchain_0_7_0_linux-amd64": {
+            "repoRuleId": "@@rules_kubeconform+//kubeconform:repositories.bzl%kubeconform_archive",
+            "attributes": {
+              "kubeconform_version": "0.7.0",
+              "platform": "linux-amd64",
+              "sha256": "c31518ddd122663b3f3aa874cfe8178cb0988de944f29c74a0b9260920d115d3"
+            }
+          },
+          "kubeconform_0_7_0_toolchain_0_7_0_linux-arm64": {
+            "repoRuleId": "@@rules_kubeconform+//kubeconform:repositories.bzl%kubeconform_archive",
+            "attributes": {
+              "kubeconform_version": "0.7.0",
+              "platform": "linux-arm64",
+              "sha256": "cc907ccf9e3c34523f0f32b69745265e0a6908ca85b92f41931d4537860eb83c"
+            }
+          },
+          "kubeconform_0_7_0_toolchain_0_7_0_linux-386": {
+            "repoRuleId": "@@rules_kubeconform+//kubeconform:repositories.bzl%kubeconform_archive",
+            "attributes": {
+              "kubeconform_version": "0.7.0",
+              "platform": "linux-386",
+              "sha256": "1b540677a77064aadae65099ac14030066d91a97b2f7bd381a955eedd636ac6b"
+            }
+          },
+          "kubeconform_0_7_0_toolchain": {
+            "repoRuleId": "@@rules_kubeconform+//kubeconform/private:toolchains_repo.bzl%toolchains_repo",
+            "attributes": {
+              "platforms": [
+                "darwin-amd64",
+                "darwin-arm64",
+                "linux-amd64",
+                "linux-arm64",
+                "linux-386"
+              ],
+              "user_repository_name": "kubeconform_0_7_0_toolchain_0_7_0"
             }
           }
         },
