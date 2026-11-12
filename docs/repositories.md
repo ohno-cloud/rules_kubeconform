@@ -28,7 +28,7 @@ Normally users configure these repositories through the kubeconform extension.
 | :------------- | :------------- | :------------- |
 | <a id="kubeconform_toolchain_repositories-name"></a>name |  Name of the toolchain registration repository and prefix for its archives.   |  none |
 | <a id="kubeconform_toolchain_repositories-kubeconform_version"></a>kubeconform_version |  Release version without a v prefix.   |  none |
-| <a id="kubeconform_toolchain_repositories-checksums"></a>checksums |  Optional platform-to-SHA-256 mapping, overriding built-in release checksums. Versions 0.6.7, 0.7.0, and 0.8.0 are built in. Other releases need entries for each platform to register. Only platforms with checksums are registered; 0.6.7 and 0.7.0 include linux-386, but 0.8.0 no longer publishes it. Platform archives remain lazily fetched.   |  `None` |
+| <a id="kubeconform_toolchain_repositories-checksums"></a>checksums |  Optional platform-to-SHA-256 mapping, overriding built-in release checksums.   |  `None` |
 
 
 <a id="kubeconform_archive"></a>
@@ -43,15 +43,10 @@ kubeconform_archive(<a href="#kubeconform_archive-name">name</a>, <a href="#kube
 
 Downloads a checksum-pinned Kubeconform release.
 
-Requires Bazel 9 or newer and either sha256 or integrity. This does not query the
+Requires either sha256 or integrity. This does not query the
 mutable GitHub releases API and declares its output reproducible for
 repository-content caching. Use it from a module extension or via use_repo_rule
 in MODULE.bazel.
-
-Consumers opt into the experimental remote cache with the startup flag
---experimental_remote_repo_contents_cache and their own --remote_cache or
---remote_executor configuration. Cache misses still execute the repository rule
-locally, and cache population requires client-side cache-write permission.
 
 **ATTRIBUTES**
 
