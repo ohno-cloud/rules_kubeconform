@@ -8,13 +8,18 @@ on:
     tags:
       - "*.*.*"
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
-      - uses: bazelbuild/setup-bazelisk@v1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: bazelbuild/setup-bazelisk@b39c379c82683a5f25d34f0d062761f62693e0b2 # v3.0.0
       - name: Check git state is clean
         run: git status --porcelain
       - name: Export release version
@@ -29,7 +34,7 @@ jobs:
       - name: Export archive integrity
         run: 'echo "RELEASE_INTEGRITY=sha256-$(openssl dgst -sha256 -binary bazel-bin/rules_kubeconform-${{ env.RELEASE_VERSION }}.tar.gz | openssl base64 -A)" >> "$GITHUB_ENV"'
       - name: Upload release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@8a0cd651e5b2365bd640854a3fa5dfc70e4875f3 # v3.0.4
         with:
           files: bazel-bin/rules_kubeconform-${{ env.RELEASE_VERSION }}.tar.gz
           fail_on_unmatched_files: true

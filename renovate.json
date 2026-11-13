@@ -1,5 +1,44 @@
 {
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:base"
-  ]
+    "config:recommended",
+    "helpers:pinGitHubActionDigests"
+  ],
+  "enabledManagers": [
+    "github-actions",
+    "bazelisk",
+    "bazel-module"
+  ],
+  "dependencyDashboard": {
+    "enabled": true
+  },
+  "automerge": false,
+  "packageRules": [
+    {
+      "description": "Keep action versions and SHA pins together for routine updates.",
+      "matchManagers": ["github-actions"],
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "groupName": "GitHub Actions"
+    },
+    {
+      "description": "Update both workspace Bazel pins together; CI reads the root pin.",
+      "matchManagers": ["bazelisk"],
+      "groupName": "Bazel"
+    },
+    {
+      "description": "Group routine Bzlmod updates, keeping major upgrades separate.",
+      "matchManagers": ["bazel-module"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "Bazel modules"
+    },
+    {
+      "description": "The example consumes this checkout through local_path_override.",
+      "matchManagers": ["bazel-module"],
+      "matchPackageNames": ["rules_kubeconform"],
+      "enabled": false
+    }
+  ],
+  "lockFileMaintenance": {
+    "enabled": true
+  }
 }
