@@ -1,14 +1,10 @@
 name: CI
 
-# Controls when the action will run.
 on:
-  # Triggers the workflow on push or pull request events but only for the main branch
   push:
     branches: [main]
   pull_request:
     branches: [main]
-
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 permissions:
@@ -19,61 +15,27 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os:
-          - ubuntu-latest
-          - macos-latest
-          # Native Windows execution is not currently supported.
-        # Keep the compatibility baseline fixed; the other entry follows .bazelversion.
-        bazel: ['9.1.0', 'pinned']
-    # The type of runner that the job will run on
+        os: [ubuntu-latest, macos-latest]
+        # An empty override lets Bazelisk use .bazelversion in each workspace.
+        bazel: ['9.1.0', '']
     runs-on: ${{ matrix.os }}
-
-    name: test-on-${{ matrix.os }}-with-bazel-${{ matrix.bazel }}
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
+    name: test-on-${{ matrix.os }}-with-bazel-${{ matrix.bazel || 'pinned' }}
+    env:
+      USE_BAZEL_VERSION: ${{ matrix.bazel }}
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - name: Select Bazel version
-        env:
-          BAZEL_VERSION: ${{ matrix.bazel }}
-        run: |
-          LOCKFILE_MODE=off
-          if [[ "$BAZEL_VERSION" == pinned ]]; then
-            BAZEL_VERSION=$(head -n 1 .bazelversion)
-            LOCKFILE_MODE=error
-          fi
-          echo "USE_BAZEL_VERSION=$BAZEL_VERSION" >> "$GITHUB_ENV"
-          echo "BAZEL_LOCKFILE_MODE=$LOCKFILE_MODE" >> "$GITHUB_ENV"
-      - uses: bazelbuild/setup-bazelisk@b39c379c82683a5f25d34f0d062761f62693e0b2 # v3.0.0
-      - name: Mount bazel action cache
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      - uses: bazel-contrib/setup-bazel@f34d6a05eae3c24acab7fa54587492daeaeffdab # 0.19.2
         with:
-          path: "~/.cache/bazel"
-          key: bazel-${{ runner.os }}-${{ runner.arch }}-${{ matrix.bazel }}-${{ github.sha }}
-          restore-keys: |
-            bazel-${{ runner.os }}-${{ runner.arch }}-${{ matrix.bazel }}-
-      - name: Mount bazel repo cache
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        with:
-          path: "~/.cache/bazel-repo"
-          key: bazel-repo-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('**/MODULE.bazel.lock') }}
-          restore-keys: |
-            bazel-repo-${{ runner.os }}-${{ runner.arch }}-
-      - name: Build
-        shell: bash
-        env:
-          # Bazelisk will download bazel to here
-          XDG_CACHE_HOME: ~/.cache/bazel-repo
-        run: bazel --bazelrc=.github/workflows/ci.bazelrc --bazelrc=.bazelrc build ... --lockfile_mode="$BAZEL_LOCKFILE_MODE"
-      - name: Test
-        shell: bash
-        env:
-          # Bazelisk will download bazel to here
-          XDG_CACHE_HOME: ~/.cache/bazel-repo
-        run: bazel --bazelrc=.github/workflows/ci.bazelrc --bazelrc=.bazelrc test ... --lockfile_mode="$BAZEL_LOCKFILE_MODE"
+          bazelisk-cache: true
+          disk-cache: ${{ github.workflow }}
+          repository-cache: true
+          # Older Bazel cannot read the pinned version's lockfile format.
+          bazelrc: |
+            common --lockfile_mode=${{ matrix.bazel == '' && 'error' || 'off' }}
+            test --test_output=errors
+      - run: bazel test //...
       - name: Test example consumer
         working-directory: example
-        run: bazel test //... --test_output=errors --lockfile_mode="$BAZEL_LOCKFILE_MODE"
+        run: bazel test //...
