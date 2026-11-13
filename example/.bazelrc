@@ -1,0 +1,4 @@
+# Optional: enable Bazel 9 remote repository-content caching alongside your own
+# --remote_cache or --remote_executor configuration. Cache misses still fetch
+# locally, and cache population requires client-side cache-write permission.
+# startup --experimental_remote_repo_contents_cache

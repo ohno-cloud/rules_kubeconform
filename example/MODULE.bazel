@@ -1,23 +1,32 @@
 module(
     name = "rules_kubeconform_example",
     version = "0.0.0",
-    compatibility_level = 1,
+    bazel_compatibility = [">=9.0.0"],
 )
 
 bazel_dep(name = "rules_kubeconform", version = "0.0.0")
-
 local_path_override(
     module_name = "rules_kubeconform",
-    path = "../"
+    path = "../",
 )
 
 # Extension usage
 kubeconform = use_extension("@rules_kubeconform//kubeconform:extensions.bzl", "kubeconform")
 
-kubeconform.toolchain(version="0.6.7")
+# This release has built-in archive checksums. Other releases can provide a
+# platform-to-SHA-256 mapping with checksums = {...}.
+kubeconform.toolchain(version = "0.8.0")
 
+# A distinct name allows another version alongside the default toolchain.
+# Test it with: bazel test //... --extra_toolchains=@kubeconform_0_7_0_toolchain//...
+kubeconform.toolchain(
+    name = "kubeconform_0_7_0_toolchain",
+    version = "0.7.0",
+)
 kubeconform.schema_import(
     name = "kubernetes_json_schema",
+    # Use a full commit SHA. Schema hashes are discovered on first use and saved
+    # as module facts; commit and review MODULE.bazel.lock after changing this.
     commit = "f5e9af7e64b63484e2bf2ee28afee3f3f8e2e9b1",
     github_repo = "yannh/kubernetes-json-schema",
     kube_version = "1.31.0",
@@ -25,11 +34,11 @@ kubeconform.schema_import(
         "Deployment": ["apps/v1"],
     },
 )
-
 use_repo(
     kubeconform,
+    "kubeconform_0_7_0_toolchain",
+    "kubeconform_toolchain",
     "kubernetes_json_schema",
-    "kubeconform_0_6_7_toolchains",
 )
 
-register_toolchains("@kubeconform_0_6_7_toolchains//...")
+register_toolchains("@kubeconform_toolchain//...")

@@ -1,7 +1,11 @@
 # Bazel settings that apply to this repository.
 # Take care to document any settings that you expect users to apply.
-# Settings that apply only to CI are in .github/workflows/ci.bazelrc
+# CI caching and options are configured in .github/workflows/.
 build --nolegacy_external_runfiles
+
+# Stardoc needs protoc. Bazel 9 can use a prebuilt compiler instead of compiling
+# it (and its C++ dependencies) with the local host toolchain.
+build --@protobuf//bazel/toolchains:prefer_prebuilt_protoc
 
 # Load any settings specific to the current user.
 # .bazelrc.user should appear in .gitignore so that settings are not shared with team members

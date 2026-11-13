@@ -42,10 +42,16 @@ Defines a kubeconform lint execution.
 <pre>
 load("@rules_kubeconform//kubeconform:defs.bzl", "kubeconform_import")
 
-kubeconform_import(<a href="#kubeconform_import-name">name</a>, <a href="#kubeconform_import-resources">resources</a>, <a href="#kubeconform_import-commit">commit</a>, <a href="#kubeconform_import-github_repo">github_repo</a>, <a href="#kubeconform_import-kube_version">kube_version</a>)
+kubeconform_import(<a href="#kubeconform_import-name">name</a>, <a href="#kubeconform_import-resources">resources</a>, <a href="#kubeconform_import-commit">commit</a>, <a href="#kubeconform_import-github_repo">github_repo</a>, <a href="#kubeconform_import-integrities">integrities</a>, <a href="#kubeconform_import-kube_version">kube_version</a>)
 </pre>
 
-Defines an imported kubeconform schemas.
+Imports only the requested Kubeconform schemas.
+
+With a complete integrities mapping, downloads are verified and the repository
+is declared reproducible for Bazel 9 repository-content caching. Without one,
+the rule remains usable but does not declare itself reproducible; its metadata
+reports the checksums needed to pin it. Prefer the module extension, which
+discovers these checksums and preserves them in MODULE.bazel.lock automatically.
 
 **ATTRIBUTES**
 
@@ -56,6 +62,7 @@ Defines an imported kubeconform schemas.
 | <a id="kubeconform_import-resources"></a>resources |  Resource schemas to import.   | <a href="https://bazel.build/rules/lib/core/dict">Dictionary: String -> List of strings</a> | required |  |
 | <a id="kubeconform_import-commit"></a>commit |  Commit.   | String | required |  |
 | <a id="kubeconform_import-github_repo"></a>github_repo |  GitHub repo name.   | String | required |  |
+| <a id="kubeconform_import-integrities"></a>integrities |  Schema filename-to-SRI checksum mapping. The module extension discovers and records these automatically.   | <a href="https://bazel.build/rules/lib/core/dict">Dictionary: String -> String</a> | optional |  `{}`  |
 | <a id="kubeconform_import-kube_version"></a>kube_version |  Kubernetes version.   | String | required |  |
 
 

@@ -8,36 +8,43 @@ on:
     tags:
       - "*.*.*"
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
-      - uses: bazelbuild/setup-bazelisk@v1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: bazel-contrib/setup-bazel@f34d6a05eae3c24acab7fa54587492daeaeffdab # 0.19.2
+        with:
+          bazelisk-cache: true
+          disk-cache: ${{ github.workflow }}
+          repository-cache: true
       - name: Check git state is clean
         run: git status --porcelain
       - name: Export release version
         run: 'echo "RELEASE_VERSION=${GITHUB_REF##*/}" >> $GITHUB_ENV'
       - name: Build release archive
-        env:
-          # Bazelisk will download bazel to here
-          XDG_CACHE_HOME: ~/.cache/bazel-repo
-        run: bazel --bazelrc=.github/workflows/ci.bazelrc --bazelrc=.bazelrc build //:slamdev_rules_kubeconform
+        run: bazel build //:rules_kubeconform
       - name: Set versioned archive name
-        run: cp bazel-bin/slamdev_rules_kubeconform.tar.gz bazel-bin/slamdev_rules_kubeconform-v${{ env.RELEASE_VERSION }}.tar.gz
-      - name: Export checksum
-        run: 'echo "RELEASE_CHECKSUM=$(shasum -b -a 256 bazel-bin/slamdev_rules_kubeconform-v${{ env.RELEASE_VERSION }}.tar.gz | cut -d " " -f 1)" >> $GITHUB_ENV'
+        run: cp bazel-bin/rules_kubeconform.tar.gz bazel-bin/rules_kubeconform-${{ env.RELEASE_VERSION }}.tar.gz
+      - name: Export archive integrity
+        run: 'echo "RELEASE_INTEGRITY=sha256-$(openssl dgst -sha256 -binary bazel-bin/rules_kubeconform-${{ env.RELEASE_VERSION }}.tar.gz | openssl base64 -A)" >> "$GITHUB_ENV"'
       - name: Upload release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@8a0cd651e5b2365bd640854a3fa5dfc70e4875f3 # v3.0.4
         with:
-          files: bazel-bin/slamdev_rules_kubeconform-v${{ env.RELEASE_VERSION }}.tar.gz
+          files: bazel-bin/rules_kubeconform-${{ env.RELEASE_VERSION }}.tar.gz
           fail_on_unmatched_files: true
           body: |
             ```starlark
-            http_archive(
-                name = "slamdev_rules_kubeconform",
-                sha256 = "${{ env.RELEASE_CHECKSUM }}",
-                url = "https://github.com/slamdev/rules_kubeconform/releases/download/${{ env.RELEASE_VERSION }}/slamdev_rules_kubeconform-v${{ env.RELEASE_VERSION }}.tar.gz",
+            bazel_dep(name = "rules_kubeconform", version = "${{ env.RELEASE_VERSION }}")
+            archive_override(
+                module_name = "rules_kubeconform",
+                integrity = "${{ env.RELEASE_INTEGRITY }}",
+                urls = ["https://github.com/${{ github.repository }}/releases/download/${{ env.RELEASE_VERSION }}/rules_kubeconform-${{ env.RELEASE_VERSION }}.tar.gz"],
             )
             ```
